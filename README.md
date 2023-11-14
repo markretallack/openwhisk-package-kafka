@@ -20,7 +20,7 @@
 # Apache OpenWhisk package for communication with Kafka or IBM Message Hub
 
 [![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0)
-[![Build Status](https://travis-ci.com/apache/openwhisk-package-kafka.svg?branch=master)](https://travis-ci.com/github/apache/openwhisk-package-kafka)
+[![Build Status](https://travis-ci.org/apache/openwhisk-package-kafka.svg?branch=master)](https://travis-ci.org/apache/openwhisk-package-kafka)
 
 This project is an OpenWhisk package that allows you to communicate with Kafka or IBM Message Hub instances for publishing and consuming messages using native high performance Kafka API.
 
@@ -49,7 +49,7 @@ While this list of parameters may seem daunting, they can be automatically set f
 
 1. Create an instance of Message Hub service under your current organization and space that you are using for OpenWhisk.
 
-2. Verify that the topic you want to listen to already exists in Message Hub or create a new topic, for example `mytopic`.
+2. Verify that the the topic you want to listen to already exists in Message Hub or create a new topic, for example `mytopic`.
 
 3. Refresh the packages in your namespace. The refresh automatically creates a package binding for the Message Hub service instance that you created.
 
@@ -109,22 +109,6 @@ Example:
 $ wsk trigger create MyKafkaTrigger -f /whisk.system/messaging/kafkaFeed -p brokers "[\"mykafkahost:9092\", \"mykafkahost:9093\"]" -p topic mytopic -p isJSONData true
 ```
 
-### Using a separated kafka feed provider for each user
-Sometimes users may not want to expose their kafka to the shared feed providers which are provided by OpenWhisk cloud provider.
-They can run their own providers and use their own CouchDB/Cloudant by passing below additional parameters when **create/update/get/delete** triggers:
-
-|Name|Type|Description|
-|---|---|---|
-|dedicated|Boolean|`true` to use dedicated kafka feed providers and CouchDB/Cloudant, default is `false`|
-|DB_URL|URL|The base URL(including username:password) for persistent storage (either CouchDB or Cloudant)|
-|DB_NAME|String|The database name for triggers|
-|workers|An array of the IDs of the running instances with each ID of the form `workerX`. e.g. `["worker0", "worker1"]`|
-
-Example:
-```
-$ wsk trigger create MyKafkaTrigger -f /whisk.system/messaging/kafkaFeed -p brokers "[\"mykafkahost:9092\", \"mykafkahost:9093\"]" -p topic mytopic -p isJSONData true -p dedicated true -p DB_URL http://admin:admin@localhost:5984 -p DB_NAME dedicated_triggers -p workers "[\"worker0\"]"
-```
-
 ### Listening for messages
 After creating a trigger, the system will monitor the specified topic in your messaging service. When new messages are posted, the trigger will be fired.
 
@@ -137,7 +121,7 @@ The payload of that trigger will contain a `messages` field which is an array of
 
 In Kafka terms, these fields should be self-evident. However, `key` has an optional feature `isBinaryKey` that allows the `key` to transmit binary data. Additionally, the `value` requires special consideration. Optional fields `isJSONData` and `isBinaryValue` are available to handle JSON and binary messages. These fields, `isJSONData` and `isBinaryValue`, cannot be used in conjunction with each other.
 
-As an example, if `isBinaryKey` was set to `true` when the trigger was created, the `key` will be encoded as a Base64 string when returned from the payload of a fired trigger.
+As an example, if `isBinaryKey` was set to `true` when the trigger was created, the `key` will be encoded as a Base64 string when returned from they payload of a fired trigger.
 
 For example, if a `key` of `Some key` is posted with `isBinaryKey` set to `true`, the trigger payload will resemble the below:
 
@@ -304,7 +288,7 @@ e.g.
 }
 ```
 
- Triggers may become inactive when certain exceptional behavior occurs. For example, there was an error firing the trigger, or it was not possible to connect to the kafka brokers. When a trigger becomes inactive the status object will contain additional information as to the cause.
+ Triggers may become inactive when certain exceptional behavior occurs. For example, there was an error firing the trigger or it was not possible to connect to the kafka brokers. When a trigger becomes inactive the status object will contain additional information as to the cause.
 
  e.g
 
@@ -396,7 +380,7 @@ The action caller (you, or your code) must first Base64 encode the data, for exa
 Example that integrates OpenWhisk with IBM Message Hub, Node Red, IBM Watson IoT, IBM Object Storage, IBM Data Science Experience (Spark) service can be [found here](https://medium.com/openwhisk/transit-flexible-pipeline-for-iot-data-with-bluemix-and-openwhisk-4824cf20f1e0).
 
 ## Architecture
-Architecture documentation and diagrams, please refer to the [Architecture Docs](docs/arch/README.md)
+Archtecture documentation and diagrams, please refer to the [Architecture Docs](docs/arch/README.md)
 
 ## Development and Testing
 If you wish to deploy the feed service yourself, please refer to the [Development Guide](docs/dev/README.md).

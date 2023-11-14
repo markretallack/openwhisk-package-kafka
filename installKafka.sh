@@ -81,29 +81,23 @@ $WSK_CLI -i --apihost "$EDGEHOST" action update --kind nodejs:default messaging/
     --auth "$AUTH" \
     -a feed true \
     -a description 'Feed to listen to Kafka messages' \
-    -a parameters '[ {"name":"brokers", "required":true, "updatable":false, "description": "Array of Kafka brokers"}, {"name":"topic", "required":true, "updatable":false, "description": "Topic to subscribe to"}, {"name":"isJSONData", "required":false, "updatable":true, "description": "Attempt to parse message value as JSON"}, {"name":"isSaslAuth", "required":false, "updatable":true, "description": "Set to use SASL Authenticaion"},{"name":"username", "required":false, "updatable":true, "description": "Set to use SASL Username"},{"name":"password", "required":false, "updatable":true, "description": "Set to use SASL Password"},{"name":"sasl_mechanisms", "required":false, "updatable":true, "description": "Set to use SASL mechanisms"}, {"name":"isBinaryKey", "required":false, "updatable":true, "description": "Encode key as Base64"}, {"name":"isBinaryValue", "required":false, "updatable":true, "description": "Encode message value as Base64"}, {"name":"endpoint", "required":true, "updatable":false, "description": "Hostname and port of OpenWhisk deployment"}]' \
+    -a parameters '[ {"name":"brokers", "required":true, "updatable":false, "description": "Array of Kafka brokers"}, {"name":"topic", "required":true, "updatable":false, "description": "Topic to subscribe to"}, {"name":"isJSONData", "required":false, "updatable":true, "description": "Attempt to parse message value as JSON"}, {"name":"isBinaryKey", "required":false, "updatable":true, "description": "Encode key as Base64"}, {"name":"isBinaryValue", "required":false, "updatable":true, "description": "Encode message value as Base64"}, {"name":"endpoint", "required":true, "updatable":false, "description": "Hostname and port of OpenWhisk deployment"}]' \
     -a sampleInput '{"brokers":"[\"127.0.0.1:9093\"]", "topic":"mytopic", "isJSONData":"false", "endpoint": "openwhisk.ng.bluemix.net"}'
 
-# create messagingWebDedicated package and web version of feed action
-$WSK_CLI -i --apihost "$EDGEHOST" package update messagingWebDedicated \
-    --auth "$AUTH" \
-    --shared no \
-    -p endpoint "$APIHOST"
-
-# rebind package, 
-# need to delete the existing package (if it does not exist, dont fail)
-$WSK_CLI -i --apihost "$EDGEHOST" package delete messagingWeb --auth "$AUTH" || true
+# create messagingWeb package and web version of feed action
 if [ -n "$WORKERS" ];
 then
-    $WSK_CLI -i --apihost "$EDGEHOST" package bind messagingWebDedicated messagingWeb \
+    $WSK_CLI -i --apihost "$EDGEHOST" package update messagingWeb \
         --auth "$AUTH" \
+        --shared no \
         -p endpoint "$APIHOST" \
         -p DB_URL "$DB_URL" \
         -p DB_NAME "$DB_NAME"  \
         -p workers "$WORKERS"
 else
-    $WSK_CLI -i --apihost "$EDGEHOST" package bind messagingWebDedicated messagingWeb \
+    $WSK_CLI -i --apihost "$EDGEHOST" package update messagingWeb \
         --auth "$AUTH" \
+        --shared no \
         -p endpoint "$APIHOST" \
         -p DB_URL "$DB_URL" \
         -p DB_NAME "$DB_NAME"
@@ -126,7 +120,7 @@ zip -r kafkaFeedWeb.zip lib package.json kafkaFeedWeb.js node_modules
 cd $OLD_PATH
 
 
-$WSK_CLI -i --apihost "$EDGEHOST" action update --kind nodejs:default messagingWebDedicated/kafkaFeedWeb "$PACKAGE_HOME/action/kafkaFeedWeb.zip" \
+$WSK_CLI -i --apihost "$EDGEHOST" action update --kind nodejs:default messagingWeb/kafkaFeedWeb "$PACKAGE_HOME/action/kafkaFeedWeb.zip" \
     --auth "$AUTH" \
     --web true \
     -a description 'Write a new trigger to Kafka provider DB' \
