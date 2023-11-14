@@ -143,6 +143,18 @@ class ConsumerProcess (Process):
         self.triggerURL = self.__triggerURL(params["triggerURL"])
         self.brokers = params["brokers"]
         self.topic = params["topic"]
+        
+        print(params)
+        self.isSaslAuth=False
+        if "isSaslAuth" in params:
+            self.isSaslAuth = params["isSaslAuth"]
+        
+        if "username" in params:
+            self.username = params["username"]
+        if "password" in params:
+            self.password = params["password"]
+        if "sasl_mechanisms" in params:
+            sasl.sasl_mechanisms = params["sasl_mechanisms"]
 
         self.sharedDictionary = sharedDictionary
 
@@ -303,6 +315,14 @@ class ConsumerProcess (Process):
                         'isolation.level': 'read_uncommitted'
                     }
 
+            if self.isSaslAuth:
+                config.update({'ssl.ca.location': '/etc/ssl/certs/',
+                                'sasl.mechanisms': self.sasl_mechanisms,
+                                'sasl.username': self.username,
+                                'sasl.password': self.password,
+                                'security.protocol': 'sasl_ssl'
+                             })                
+
             if self.isMessageHub:
                 # append Message Hub specific config
                 config.update({'ssl.ca.location': '/etc/ssl/certs/',
@@ -311,6 +331,8 @@ class ConsumerProcess (Process):
                                 'sasl.password': self.password,
                                 'security.protocol': 'sasl_ssl'
                              })
+
+            print("using cfg: "+str(config))
 
             consumer = KafkaConsumer(config)
             consumer.subscribe([self.topic], self.__on_assign, self.__on_revoke)
