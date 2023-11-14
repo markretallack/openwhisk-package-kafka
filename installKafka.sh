@@ -90,8 +90,9 @@ $WSK_CLI -i --apihost "$EDGEHOST" package update messagingWebDedicated \
     --shared no \
     -p endpoint "$APIHOST"
 
-# rebind package
-$WSK_CLI -i --apihost "$EDGEHOST" package delete messagingWeb --auth "$AUTH"
+# rebind package, 
+# need to delete the existing package (if it does not exist, dont fail)
+$WSK_CLI -i --apihost "$EDGEHOST" package delete messagingWeb --auth "$AUTH" || true
 if [ -n "$WORKERS" ];
 then
     $WSK_CLI -i --apihost "$EDGEHOST" package bind messagingWebDedicated messagingWeb \
